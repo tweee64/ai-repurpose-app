@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  password          String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  transcriptionJobs TranscriptionJob[]
+  drafts            Draft[]
+  connectedAccounts ConnectedAccount[]
+}
+
+model TranscriptionJob {
+  id           String      @id @default(cuid())
+  userId       String
+  sourceType   String      @default("youtube")  // "youtube" | "blog_url" | "pdf"
+  sourceUrl    String?                           // YouTube or blog URL; null for PDF uploads
+  fileName     String?                           // original filename for PDF jobs
+  status       String      @default("pending")
+  errorMessage String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  transcript   Transcript?
+  user         User        @relation(fields: [userId], references: [id])
+}
+
+model Transcript {
+  id        String           @id @default(cuid())
+  jobId     String           @unique
+  text      String
+  createdAt DateTime         @default(now())
+  job       TranscriptionJob @relation(fields: [jobId], references: [id])
+  drafts    Draft[]
+}
+
+model Draft {
+  id           String    @id @default(cuid())
+  userId       String
+  transcriptId String
+  format       String    // "twitter_thread" | "linkedin_post" | "blog_post"
+  content      String    // JSON string: { "tweets": [{ "index": 1, "text": "..." }] }
+  bufferId     String?   // Buffer post_id (root update for threads); null until scheduled
+  scheduledFor DateTime? // Requested publish datetime (UTC); null until scheduled
+  scheduledAt  DateTime? // When the schedule request was made; null until scheduled
+  bufferStatus String?   // "scheduled" | "published" | "failed"; null until scheduled
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  transcript   Transcript @relation(fields: [transcriptId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+}
+
+model ConnectedAccount {
+  id             String    @id @default(cuid())
+  userId         String
+  platform       String    // "twitter" | "linkedin"
+  handle         String    // e.g. "@yourhandle"
+  accessToken    String    // Platform OAuth access token (never returned to client)
+  refreshToken   String?   // LinkedIn only — used to refresh expired access tokens
+  tokenExpiresAt DateTime? // LinkedIn only — when the access token expires
+  tokenInvalid   Boolean   @default(false) // true when token is revoked/expired
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, platform])
+}

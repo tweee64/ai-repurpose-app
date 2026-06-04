@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Background rounded square -->
+  <rect width="40" height="40" rx="9" fill="#6366f1"/>
+
+  <!-- 270° circular arc (CCW): right → top → left → bottom = "repurpose" symbol -->
+  <path d="M 30 20 A 10 10 0 1 0 20 30"
+        stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Arrowhead at arc end (20,30), pointing right (direction of CCW travel at bottom) -->
+  <path d="M 18.5 28 L 22 30 L 18.5 32"
+        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 4-pointed sparkle at center = AI -->
+  <path d="M 20 16.5 L 21 19 L 23.5 20 L 21 21 L 20 23.5 L 19 21 L 16.5 20 L 19 19 Z"
+        fill="white"/>
+</svg>
