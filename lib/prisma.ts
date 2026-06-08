@@ -11,10 +11,21 @@ function createPrismaClient() {
 }
 
 // Prevent multiple instances of Prisma Client in development (hot-reloading)
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as { _prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma._prisma) {
+    globalForPrisma._prisma = createPrismaClient();
+  }
+  return globalForPrisma._prisma;
 }
+
+// Lazy proxy — createPrismaClient() is only called on first property access
+// (i.e. at request time), never during the Next.js build module scan.
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = (client as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof value === 'function' ? (value as Function).bind(client) : value;
+  },
+});
