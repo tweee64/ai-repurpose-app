@@ -3,6 +3,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ConnectedAccountCard } from './ConnectedAccountCard';
+import { TwitterConnectDialog } from './TwitterConnectDialog';
 import { useConnectedAccounts } from './useConnectedAccounts';
 
 export function ConnectedAccountsSection() {
@@ -51,17 +52,7 @@ export function ConnectedAccountsSection() {
         {/* Connect CTAs — shown per platform when not yet connected */}
         {!isLoading && (!isTwitterConnected || !isLinkedInConnected) && (
           <div className="flex flex-wrap gap-3">
-            {!isTwitterConnected && (
-              <Button
-                variant="default"
-                size="sm"
-                asChild
-                className="shrink-0 bg-black hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
-                aria-label="Connect X / Twitter account"
-              >
-                <a href="/api/auth/twitter">Connect X / Twitter</a>
-              </Button>
-            )}
+            {!isTwitterConnected && <TwitterConnectDialog />}
             {!isLinkedInConnected && (
               <Button
                 variant="default"

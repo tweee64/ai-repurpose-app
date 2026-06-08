@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { TwitterConnectDialog } from './TwitterConnectDialog';
 import type { ConnectedAccountSummary } from '@/types/connected-account';
 
 interface ConnectedAccountCardProps {
@@ -100,14 +101,18 @@ export function ConnectedAccountCard({
               >
                 Token expired
               </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                aria-label={`Reconnect ${label} account ${account.handle}`}
-              >
-                <a href={reconnectHref}>Reconnect</a>
-              </Button>
+              {account.platform === 'twitter' ? (
+                <TwitterConnectDialog variant="reconnect" />
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  aria-label={`Reconnect ${label} account ${account.handle}`}
+                >
+                  <a href={reconnectHref}>Reconnect</a>
+                </Button>
+              )}
             </>
           ) : (
             <>
